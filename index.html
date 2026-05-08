@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Portfolio Template — a portfolio you fill in by prompting</title>
+	<meta name="description"
+		content="An Astro portfolio and engineering journal you set up by talking to Claude Code. Four slash commands and you're done." />
+	<link rel="icon" type="image/svg+xml"
+		href="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%231E3A8A%22%2F%3E%3Cpath%20d%3D%22M9.5%2025%20L15.5%207%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M16.5%2025%20L22.5%207%22%20stroke%3D%22%232563EB%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+		rel="stylesheet" />
+	<style>
+		:root {
+			/* Twin Slash brand tokens */
+			--ts-navy: #1E3A8A;
+			--ts-navy-deep: #152A63;
+			--ts-blue: #2563EB;
+			--ts-ink: #0A0A0A;
+			--ts-muted: #5B6573;
+			--ts-cream: #F5F5F7;
+			--ts-white: #FFFFFF;
+			--ts-line: #E4E4E7;
+			--ts-dark: #0F172A;
+
+			/* Aliases used by existing component styles */
+			--jay-deep: var(--ts-navy);
+			--jay-blue: var(--ts-blue);
+			--jay-bright: #3B82F6;
+			--jay-sky: #DBEAFE;
+			--jay-mist: #EFF6FF;
+			--jay-bar: var(--ts-dark);
+			--jay-white: var(--ts-white);
+			--ink: var(--ts-ink);
+			--ink-soft: var(--ts-muted);
+			--ink-faint: #9CA3AF;
+			--bg: var(--ts-cream);
+			--border: var(--ts-line);
+
+			--font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+			--font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+
+			--radius-sm: 8px;
+			--radius-md: 14px;
+			--radius-lg: 20px;
+			--radius-pill: 999px;
+		}
+
+		*,
+		*::before,
+		*::after {
+			box-sizing: border-box;
+		}
+
+		html {
+			font-size: 17px;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			scroll-behavior: smooth;
+		}
+
+		body {
+			margin: 0;
+			font-family: var(--font-sans);
+			font-weight: 400;
+			color: var(--ink);
+			line-height: 1.6;
+			background: var(--bg);
+			min-height: 100vh;
+		}
+
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 3rem 1.5rem 4rem;
+		}
+
+		.works-with {
+			display: flex;
+			width: fit-content;
+			align-items: center;
+			gap: 0.55rem;
+			font-size: 0.95rem;
+			font-weight: 500;
+			color: var(--ink-soft);
+			text-decoration: none;
+			margin: 0 0 4rem;
+			transition: color 0.2s ease;
+		}
+
+		.works-with:hover {
+			color: var(--jay-deep);
+		}
+
+		.works-with .cc-logo {
+			width: 18px;
+			height: 18px;
+			color: #d97757;
+			flex-shrink: 0;
+		}
+
+		.site-header {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 1.5rem 1.5rem 0;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.lockup {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.65rem;
+			text-decoration: none;
+			color: var(--ts-ink);
+		}
+
+		.lockup .mark {
+			width: 32px;
+			height: 32px;
+			flex-shrink: 0;
+			display: block;
+		}
+
+		.lockup .wordmark {
+			font-family: var(--font-mono);
+			font-weight: 600;
+			font-size: 1rem;
+			letter-spacing: -0.01em;
+			color: inherit;
+		}
+
+		.lockup .wordmark .slash {
+			color: var(--ts-blue);
+		}
+
+		.site-header .nav-link {
+			font-family: var(--font-mono);
+			font-size: 0.78rem;
+			font-weight: 500;
+			color: var(--ts-muted);
+			text-decoration: none;
+			letter-spacing: 0.01em;
+			transition: color 0.2s ease;
+		}
+
+		.site-header .nav-link:hover {
+			color: var(--ts-navy);
+		}
+
+		h1 {
+			font-weight: 700;
+			font-size: 2.75rem;
+			line-height: 1.05;
+			letter-spacing: -0.02em;
+			margin: 0 0 1.25rem;
+			color: var(--ts-ink);
+		}
+
+		h1 .accent {
+			color: var(--jay-blue);
+			position: relative;
+			white-space: nowrap;
+		}
+
+		.lede {
+			font-size: 1.18rem;
+			font-weight: 400;
+			color: var(--ink-soft);
+			margin: 0 0 2.25rem;
+			max-width: 38rem;
+		}
+
+		.cta {
+			display: flex;
+			gap: 0.75rem;
+			flex-wrap: wrap;
+			margin: 0 0 1rem;
+		}
+
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.85rem 1.4rem;
+			font-family: var(--font-sans);
+			font-size: 0.98rem;
+			font-weight: 700;
+			border-radius: var(--radius-pill);
+			text-decoration: none;
+			transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+			border: 1.5px solid transparent;
+		}
+
+		.btn-primary {
+			background: var(--jay-deep);
+			color: var(--jay-white);
+		}
+
+		.btn-primary:hover {
+			background: var(--jay-blue);
+		}
+
+		.btn-secondary {
+			background: var(--jay-white);
+			color: var(--jay-deep);
+			border-color: var(--jay-sky);
+		}
+
+		.btn-secondary:hover {
+			border-color: var(--jay-blue);
+			color: var(--jay-blue);
+		}
+
+		.btn .arrow {
+			transition: transform 0.2s ease;
+		}
+
+		.btn:hover .arrow {
+			transform: translateX(3px);
+		}
+
+		section {
+			margin: 0 0 4rem;
+		}
+
+		h2 {
+			font-weight: 700;
+			font-size: 1.5rem;
+			letter-spacing: -0.015em;
+			margin: 0 0 1.5rem;
+			color: var(--ink);
+		}
+
+		.commands {
+			display: grid;
+			gap: 0.75rem;
+		}
+
+		.cmd {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 1.25rem;
+			align-items: center;
+			padding: 1.1rem 1.25rem;
+			background: var(--jay-white);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-md);
+			transition: border-color 0.2s ease, transform 0.2s ease;
+		}
+
+		.cmd:hover {
+			border-color: var(--jay-bright);
+		}
+
+		.cmd .slash {
+			font-family: var(--font-mono);
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--jay-white);
+			background: var(--jay-deep);
+			padding: 0.45rem 0.8rem;
+			border-radius: var(--radius-sm);
+			white-space: nowrap;
+		}
+
+		.cmd p {
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: 0.98rem;
+		}
+
+		pre {
+			position: relative;
+			font-family: var(--font-mono);
+			font-size: 0.82rem;
+			background: var(--ts-dark);
+			color: #cbd5e1;
+			padding: 2.25rem 1.4rem 1.4rem;
+			border-radius: var(--radius-md);
+			border: 1px solid #1e293b;
+			line-height: 1.7;
+			margin: 0;
+			tab-size: 2;
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+		}
+
+		/* Terminal-style top bar */
+		pre::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 1.5rem;
+			background: rgba(255, 255, 255, 0.03);
+			border-bottom: 1px solid #1e293b;
+			border-radius: var(--radius-md) var(--radius-md) 0 0;
+		}
+
+		pre::after {
+			content: "";
+			position: absolute;
+			top: 0.45rem;
+			left: 0.85rem;
+			width: 0.55rem;
+			height: 0.55rem;
+			border-radius: 50%;
+			background: #475569;
+			box-shadow:
+				0.85rem 0 0 #475569,
+				1.7rem 0 0 #475569;
+		}
+
+		pre .comment {
+			color: #64748b;
+		}
+
+		pre .cmd-text {
+			color: #93c5fd;
+			font-weight: 500;
+		}
+
+		.install {
+			margin: 0 0 1.75rem;
+		}
+
+		.install:last-child {
+			margin-bottom: 0;
+		}
+
+		.install-title {
+			display: flex;
+			align-items: center;
+			gap: 0.55rem;
+			flex-wrap: wrap;
+			font-weight: 700;
+			font-size: 0.95rem;
+			color: var(--ink);
+			margin: 0 0 0.7rem;
+		}
+
+		.install-title code {
+			font-family: var(--font-mono);
+			font-size: 0.82rem;
+			font-weight: 500;
+			color: var(--jay-deep);
+			background: var(--jay-mist);
+			border: 1px solid var(--jay-sky);
+			padding: 0.2rem 0.5rem;
+			border-radius: 6px;
+		}
+
+		.badge {
+			font-family: var(--font-sans);
+			font-size: 0.7rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+			color: var(--jay-white);
+			background: var(--jay-blue);
+			padding: 0.18rem 0.55rem;
+			border-radius: var(--radius-pill);
+		}
+
+		.badge-soft {
+			font-family: var(--font-mono);
+			font-size: 0.7rem;
+			font-weight: 500;
+			letter-spacing: 0.02em;
+			color: var(--ink-soft);
+			background: var(--jay-mist);
+			border: 1px solid var(--jay-sky);
+			padding: 0.15rem 0.5rem;
+			border-radius: var(--radius-pill);
+		}
+
+		.site-footer {
+			margin-top: 5rem;
+			padding-top: 2rem;
+			padding-bottom: 1.5rem;
+			border-top: 1px solid var(--ts-line);
+			display: flex;
+			flex-direction: column;
+			gap: 1.25rem;
+		}
+
+		.footer-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.footer-tagline {
+			font-family: var(--font-mono);
+			font-size: 0.82rem;
+			font-weight: 500;
+			color: var(--ts-muted);
+			letter-spacing: -0.005em;
+		}
+
+		.footer-tagline .slash {
+			color: var(--ts-blue);
+		}
+
+		.social {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.icon-link {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 36px;
+			height: 36px;
+			border-radius: var(--radius-pill);
+			color: var(--ts-muted);
+			border: 1px solid var(--ts-line);
+			background: var(--ts-white);
+			text-decoration: none;
+			transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+		}
+
+		.icon-link svg {
+			width: 16px;
+			height: 16px;
+		}
+
+		.icon-link:hover {
+			color: var(--ts-white);
+			border-color: var(--ts-navy);
+			background: var(--ts-navy);
+		}
+
+		.footer-meta {
+			font-family: var(--font-mono);
+			font-size: 0.74rem;
+			color: var(--ts-muted);
+			letter-spacing: 0.01em;
+		}
+
+		.footer-meta a {
+			color: var(--ts-muted);
+			text-decoration: none;
+			font-weight: 500;
+			transition: color 0.2s ease;
+		}
+
+		.footer-meta a:hover {
+			color: var(--ts-blue);
+		}
+
+		@media (max-width: 600px) {
+			html {
+				font-size: 15px;
+			}
+
+			.site-header {
+				padding: 1.25rem 1.25rem 0;
+			}
+
+			.lockup .mark {
+				width: 28px;
+				height: 28px;
+			}
+
+			.lockup .wordmark {
+				font-size: 0.95rem;
+			}
+
+			main {
+				padding: 2.25rem 1.25rem 2.5rem;
+			}
+
+			h1 {
+				font-size: 2.25rem;
+			}
+
+			.lede {
+				font-size: 1.05rem;
+			}
+
+			.cmd {
+				grid-template-columns: 1fr;
+				gap: 0.6rem;
+			}
+
+			.cmd .slash {
+				justify-self: start;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<header class="site-header">
+		<a class="lockup" href="#">
+			<svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Twin slash mark">
+				<rect width="64" height="64" rx="14" fill="#1E3A8A" />
+				<path d="M19 50 L31 14" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+				<path d="M33 50 L45 14" stroke="#2563EB" stroke-width="6" stroke-linecap="round" />
+			</svg>
+			<span class="wordmark"><span class="slash">/</span>folio</span>
+		</a>
+		<a class="nav-link" href="https://github.com/waream2/folio" target="_blank" rel="noopener">GitHub →</a>
+	</header>
+
+	<main>
+		<h1>
+			A portfolio that <span class="accent">interviews you,</span> then writes itself.
+		</h1>
+		<p class="lede">
+			A working portfolio in minutes — about page, project write-ups,
+			and an engineering journal, all drafted in your first-person
+			voice. Run the skill, answer some questions and deploy your portfolio.
+		</p>
+
+		<div class="cta">
+			<a class="btn btn-primary" href="#start">
+				Get started <span class="arrow">→</span>
+			</a>
+			<a class="btn btn-secondary" href="https://github.com/waream2/folio">
+				View on GitHub
+			</a>
+		</div>
+
+		<a class="works-with" href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener">
+			<svg class="cc-logo" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"
+				aria-hidden="true">
+				<line x1="12" y1="2" x2="12" y2="22" />
+				<line x1="2" y1="12" x2="22" y2="12" />
+				<line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+				<line x1="19.07" y1="4.93" x2="4.93" y2="19.07" />
+			</svg>
+			Works with Claude Code
+		</a>
+
+		<section>
+			<h2>Four commands to a working portfolio.</h2>
+			<div class="commands">
+				<div class="cmd">
+					<span class="slash">/onboard</span>
+					<p>Personalizes every placeholder to get the app scaffolded up — name, title, tagline, accent color, GitHub,
+						and your URL.
+					</p>
+				</div>
+				<div class="cmd">
+					<span class="slash">/about-me</span>
+					<p>Interviews you about who you are as a builder and writes the about page in your voice.</p>
+				</div>
+				<div class="cmd">
+					<span class="slash">/draft-project</span>
+					<p>Grills you on something you built, then drops a project write-up into your work section.</p>
+				</div>
+				<div class="cmd">
+					<span class="slash">/journal-post</span>
+					<p>Watches a coding session and opens a PR with a finished blog post in your first-person voice.</p>
+				</div>
+			</div>
+		</section>
+
+		<section id="start">
+			<h2>Install.</h2>
+
+			<div class="install">
+				<p class="install-title">
+					With <code>/folio-init</code>
+					<span class="badge">recommended</span>
+				</p>
+				<pre><span class="comment"># install the skill (once)</span>
+git clone https://github.com/waream2/folio-init.git ~/.claude/skills/folio-init
+
+<span class="comment"># spin up a new portfolio, anytime, from anywhere</span>
+<span class="cmd-text">/folio-init</span></pre>
+			</div>
+
+			<div class="install">
+				<p class="install-title">
+					Without Claude Code <span class="badge-soft">curl &amp; bash</span>
+				</p>
+				<pre><span class="comment"># clone the template and pre-install the journal-post skill</span>
+curl -fsSL https://raw.githubusercontent.com/waream2/folio-init/main/init.sh \
+  | bash -s -- my-portfolio</pre>
+			</div>
+
+			<div class="install">
+				<p class="install-title">Or clone the template manually</p>
+				<pre><span class="comment"># clone</span>
+git clone https://github.com/waream2/folio.git my-folio
+cd my-folio &amp;&amp; npm install
+
+<span class="comment"># personalize</span>
+<span class="cmd-text">/onboard</span>
+
+<span class="comment"># preview</span>
+npm run dev</pre>
+			</div>
+		</section>
+
+		<footer class="site-footer">
+			<div class="footer-row">
+				<a class="lockup" href="#">
+					<svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Twin slash mark">
+						<rect width="64" height="64" rx="14" fill="#1E3A8A" />
+						<path d="M19 50 L31 14" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+						<path d="M33 50 L45 14" stroke="#2563EB" stroke-width="6" stroke-linecap="round" />
+					</svg>
+					<span class="wordmark"><span class="slash">/</span>folio</span>
+				</a>
+				<div class="social">
+					<a class="icon-link" href="https://github.com/waream2/folio" target="_blank" rel="noopener" aria-label="GitHub">
+						<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+							<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+						</svg>
+					</a>
+					<a class="icon-link" href="https://x.com/earnwhere" target="_blank" rel="noopener" aria-label="X (Twitter)">
+						<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+							<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+						</svg>
+					</a>
+					<a class="icon-link" href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener" aria-label="Claude Code">
+						<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none" aria-hidden="true">
+							<line x1="12" y1="3" x2="12" y2="21" />
+							<line x1="3" y1="12" x2="21" y2="12" />
+							<line x1="5.6" y1="5.6" x2="18.4" y2="18.4" />
+							<line x1="18.4" y1="5.6" x2="5.6" y2="18.4" />
+						</svg>
+					</a>
+				</div>
+			</div>
+
+			<div class="footer-tagline">
+				A portfolio that interviews you, then writes itself.
+			</div>
+
+			<div class="footer-row">
+				<span class="footer-meta">
+					Built by <a href="https://x.com/earnwhere" target="_blank" rel="noopener">@earnwhere</a>
+					· MIT
+				</span>
+				<span class="footer-meta">© 2026</span>
+			</div>
+		</footer>
+	</main>
+</body>
+
+</html>
